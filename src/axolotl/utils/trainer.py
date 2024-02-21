@@ -252,7 +252,7 @@ def calculate_total_num_steps(cfg, train_dataset, update=True):
             )
 
             data_loader = DataLoader(
-                train_dataset.remove_columns(["length"]),
+                train_dataset.remove_columns(["length"]) if "length" in train_dataset.features else train_dataset,
                 batch_sampler=sampler,
             )
             data_loader_len = len(data_loader) // batch_size

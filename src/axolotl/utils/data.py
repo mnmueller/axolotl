@@ -97,7 +97,7 @@ def prepare_dataset(cfg, tokenizer):
         )
 
         train_dataset = wrap_pretraining_dataset(
-            load_dataset(path, streaming=True, split="train", name=name),
+            load_dataset(path, streaming=False, split="train", name=name),
             tokenizer,
             cfg,
             ds_wrapper_partial,
@@ -108,7 +108,12 @@ def prepare_dataset(cfg, tokenizer):
         # https://discuss.huggingface.co/t/how-to-use-huggingface-trainer-streaming-datasets-without-wrapping-it-with-torchdatas-iterablewrapper/25230
         train_dataset = train_dataset.with_format("torch")
         eval_dataset = None
-        return train_dataset, eval_dataset, cfg.max_steps, prompters
+        if cfg.max_steps:
+            total_num_steps = cfg.max_steps
+        else:
+            total_num_steps = calculate_total_num_steps(cfg, train_dataset)
+
+        return train_dataset, eval_dataset, total_num_steps, prompters
 
     if eval_dataset and cfg.sample_packing and cfg.eval_sample_packing is not False:
         total_eval_steps = calculate_total_num_steps(cfg, eval_dataset, update=False)
@@ -804,7 +809,7 @@ def wrap_pretraining_dataset(
         collate_fn = PretrainingBatchSamplerDataCollatorForSeq2Seq(
             tokenizer,
             return_tensors="pt",
-            padding=True,
+            padding=False,
             pad_to_multiple_of=max_tokens * batch_size,
         )
         encode = functools.partial(
@@ -819,7 +824,8 @@ def wrap_pretraining_dataset(
     else:
         encode = functools.partial(encode_pretraining, tokenizer, max_tokens)
 
-    dataset = dataset.shuffle(seed=seed, buffer_size=buffer_size)
+
+    # dataset = dataset.shuffle(seed=seed, buffer_size=buffer_size)
     dataset = dataset.map(
         encode,
         batched=True,
