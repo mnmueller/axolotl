@@ -828,8 +828,8 @@ def wrap_pretraining_dataset(
     # dataset = dataset.shuffle(seed=seed, buffer_size=buffer_size)
     dataset = dataset.map(
         encode,
-        batched=True,
-        batch_size=buffer_size,
+        batched=False,
+        # batch_size=buffer_size,
         # input_columns="text",
         # remove all the existing columns after mapping since they end up having
         # a different length than the encoded/tokenized column
