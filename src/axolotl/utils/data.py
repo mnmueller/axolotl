@@ -829,7 +829,7 @@ def wrap_pretraining_dataset(
     dataset = dataset.map(
         encode,
         batched=True,
-        batch_size=100000000,
+        batch_size=5000000,
         # input_columns="text",
         # remove all the existing columns after mapping since they end up having
         # a different length than the encoded/tokenized column
