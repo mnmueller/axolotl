@@ -395,7 +395,7 @@ def load_tokenized_prepared_datasets(
                 ds = ds[split]
             elif isinstance(ds, DatasetDict):
                 raise ValueError(
-                    f"no {split} split found for dataset {config_dataset.path}, you may specify a split with 'split: `"
+                    f"no {split} split found for dataset {config_dataset.path}, you may specify a split with 'split: `. Splits are: {list(ds.keys())}"
                 )
 
             # support for using a subset of the data
