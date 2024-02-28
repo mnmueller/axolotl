@@ -1,0 +1,81 @@
+base_model: microsoft/phi-2
+model_type: AutoModelForCausalLM
+trust_remote_code: true
+
+model_config:
+  output_router_logits: true
+
+load_in_8bit: false
+load_in_4bit: false
+strict: false
+
+val_set_size: 0.02
+output_dir: ./logs
+
+#using lora for lower cost
+adapter:
+lora_r:
+lora_alpha:
+lora_dropout:
+lora_target_modules:
+
+seed: 42
+
+sequence_len: 1024
+sample_packing: true
+eval_sample_packing: false
+pad_to_sequence_len: true
+
+wandb_project:
+wandb_entity:
+wandb_watch:
+wandb_name:
+wandb_log_model:
+
+#only 2 epochs because of small dataset
+gradient_accumulation_steps: 1
+micro_batch_size: 2
+num_epochs: 1
+optimizer: adamw_torch
+adam_beta1: 0.9
+adam_beta2: 0.95
+adam_epsilon: 0.00001
+weight_decay: 0.1
+lr_scheduler: cosine
+learning_rate: 0.00001
+lr_quadratic_warmup: true
+cosine_min_lr_ratio: 0.1
+max_grad_norm: 1.0
+
+
+train_on_inputs: false
+group_by_length: false
+bf16: false
+fp16: false
+tf32: true
+
+gradient_checkpointing: true
+early_stopping_patience:
+resume_from_checkpoint:
+local_rank:
+logging_steps: 1
+xformers_attention:
+flash_attention: false
+
+warmup_steps: 300
+evals_per_epoch: 1
+eval_table_size:
+eval_max_new_tokens: 128
+saves_per_epoch: 10
+debug:
+#default deepspeed, can use more aggresive if needed like zero2, zero3
+deepspeed:
+fsdp:
+fsdp_config:
+
+
+dataset_prepared_path: ./dataset #Path to json dataset file in huggingface
+datasets:
+  - path: INSAIT-Institute/Parlamint-bg
+    type: completion
+
